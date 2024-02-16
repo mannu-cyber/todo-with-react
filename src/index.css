@@ -10,6 +10,15 @@ html, body{
   height: 100%;
 }
 
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #3498db; /* Color of the scrollbar thumb */
+  border-radius: 6px; /* Rounded corners of the scrollbar thumb */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
