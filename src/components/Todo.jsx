@@ -1,47 +1,60 @@
-import React, { useState, useRef, useEffect, Children } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
 const Todo = () => {
-  const [task, setTask] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [error, setError] = useState("");
 
-  const elementRef = useRef(null);
-
-  const pop = useRef(null)
-useEffect(()=>{
-  gsap.from(pop.current,{
-    scale:0,
-    duration:.5,
-  })
-})
-
+  const taskContainerRef = useRef(null);
 
   useEffect(() => {
-    if (elementRef.current) {
-      gsap.from(elementRef.current, {
+    if (taskContainerRef.current) {
+      const newTaskElement = taskContainerRef.current.firstChild;
+      gsap.from(newTaskElement, {
         y: -60,
-        opacity:0,
+        opacity: 0,
         duration: 1,
-        ease: "power3.out",
+        ease: "power2.out",
+        backgroundColor: "blue",
       });
     }
-  }, [task]);
+  }, [tasks]);
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      addTask();
+    }
+  };
 
   const addTask = () => {
-    if (newTask.trim() === "") {
+    if (newTask.trim() === " ") {
       setError("Please enter a task");
       return;
     } else if (newTask.length < 5) {
-      setError("Please add more than 4 characters");
+      setError("Please add more than 5 characters");
       return;
     } else {
       setError("");
     }
 
-    setTask([...task, newTask]);
+    setTasks([newTask, ...tasks]);
     setNewTask("");
   };
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      return;
+    }
+    localStorage.setItem("task", JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    const storedTask = localStorage.getItem("task");
+    if (storedTask) {
+      setTasks(JSON.parse(storedTask));
+    }
+  }, []);
 
   return (
     <>
@@ -57,6 +70,7 @@ useEffect(()=>{
               onChange={(e) => {
                 setNewTask(e.target.value);
               }}
+              onKeyPress={handleKeyPress}
               type="text"
               placeholder="Add Task"
               className="py-[.7vw] px-[2vw] rounded-[50px] text-black"
@@ -69,22 +83,22 @@ useEffect(()=>{
             </button>
           </div>
 
-          <div ref={elementRef} className="task-container my-[1vw] pt-6 px-[2vw] w-full flex flex-col gap-2 overflow-y-scroll h-[350px] ">
-            {task.map((task, i) => {
-              return (
-                <h1 
-                  key={i}
-                  className="hover:scale-[1.06] cursor-pointer duration-[.5s] ease-linear  text-[1.5vw] border rounded-[20px] py-1 px-6"
-                >
-                  {task}
-                </h1>
-              );
-            })}
-           
+          <div
+            ref={taskContainerRef}
+            className="task-container my-[1vw] py-1 px-[2vw] w-full flex flex-col gap-2 overflow-y-scroll h-[350px] "
+          >
+            {tasks.map((task, i) => (
+              <h1
+                key={i}
+                className="hover:scale-y-[1.09] hover:border-none hover:bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 cursor-pointer duration-[.3s] ease-linear  text-[1.5vw] border rounded-[20px] py-1 px-6"
+              >
+                {task}
+              </h1>
+            ))}
           </div>
-          <p ref={pop} className="text-center fixed top-[4vw] text-red-600 mt-3 text-3xl">
-              {error}
-            </p>
+          <p className="text-center fixed top-[4vw] text-red-600 mt-3 text-3xl">
+            {error}
+          </p>
         </div>
       </div>
     </>
