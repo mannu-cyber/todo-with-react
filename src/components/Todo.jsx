@@ -5,8 +5,8 @@ const Todo = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [error, setError] = useState("");
-
   const taskContainerRef = useRef(null);
+  const deleAnime = useRef(null);
 
   useEffect(() => {
     if (taskContainerRef.current) {
@@ -55,6 +55,11 @@ const Todo = () => {
       setTasks(JSON.parse(storedTask));
     }
   }, []);
+  const deleteTask = (index) => {
+    const updatedTasks = tasks.filter((_, i) => i !== index);
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
 
   return (
     <>
@@ -85,15 +90,23 @@ const Todo = () => {
 
           <div
             ref={taskContainerRef}
-            className="task-container my-[1vw] py-1 px-[2vw] w-full flex flex-col gap-2 overflow-y-scroll h-[350px] "
+            className=" task-container my-[1vw] py-1 px-[2vw] w-full flex flex-col gap-2 overflow-y-scroll h-[350px] "
           >
-            {tasks.map((task, i) => (
-              <h1
-                key={i}
-                className="hover:scale-y-[1.09] hover:border-none hover:bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 cursor-pointer duration-[.3s] ease-linear  text-[1.5vw] border rounded-[20px] py-1 px-6"
+            {tasks.map((task, index) => (
+              <div
+                className="task flex w-full justify-between gap-2"
+                key={index}
               >
-                {task}
-              </h1>
+                <h1 className="hover:scale-y-[1.09] hover:border-none w-full hover:bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 cursor-pointer duration-[.3s] ease-linear  text-[1.5vw] border rounded-[20px] py-1 px-6">
+                  {task}
+                </h1>
+                <button
+                  onClick={() => deleteTask(index)}
+                  className=" border py-1 px-6 rounded-[20px] hover:bg-slate-500"
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
           <p className="text-center fixed top-[4vw] text-red-600 mt-3 text-3xl">
